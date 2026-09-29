@@ -19,8 +19,20 @@ import re
 import subprocess
 import sys
 
-import markdown
+from markdown_it import MarkdownIt
+from pygments import highlight as pyg_highlight
 from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
+from pygments.util import ClassNotFound
+
+
+def highlight(code, lang, attrs):
+    """Syntax-highlight fenced code; unknown/empty language -> plain block."""
+    try:
+        lexer = get_lexer_by_name(lang or "text")
+    except ClassNotFound:
+        lexer = get_lexer_by_name("text")
+    return pyg_highlight(code, lexer, HtmlFormatter(nowrap=True))  # markdown-it wraps it in <pre><code>
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -93,15 +105,17 @@ def convert(md_text):
 
     text = re.sub(r"\[\[(.+?)\]\]", en, text)
     text = restore_code(text, stash)
-    body = markdown.markdown(
-        text,
-        extensions=["fenced_code", "tables", "codehilite", "md_in_html", "sane_lists", "attr_list"],
-        extension_configs={"codehilite": {"guess_lang": False, "css_class": "highlight"}},
-    )
+    # HTML wrapper lines (<div ...> / </div>) need blank lines around them so the
+    # Markdown inside is still parsed (CommonMark HTML-block rule)
+    text = re.sub(r"^(<div[^>]*>)[ \t]*$", r"\1\n", text, flags=re.M)
+    text = re.sub(r"^(</div>)[ \t]*$", r"\n\1\n", text, flags=re.M)
+    md = (MarkdownIt("commonmark", {"html": True, "highlight": highlight})
+          .enable("table").enable("strikethrough"))
+    body = md.render(text)
     body = re.sub(r"ENLINEPH(\d{4})X", lambda m: en_lines[int(m.group(1))], body)
-    pyg = HtmlFormatter(style="friendly").get_style_defs(".highlight")
+    pyg = HtmlFormatter(style="friendly").get_style_defs("pre")
     return ("<!doctype html><html><head><meta charset='utf-8'>"
-            "<style>%s\n%s\n.highlight{background:#f6f8fa}</style></head><body>%s</body></html>"
+            "<style>%s\n%s\npre{background:#f6f8fa}</style></head><body>%s</body></html>"
             % (CSS, pyg, body))
 
 

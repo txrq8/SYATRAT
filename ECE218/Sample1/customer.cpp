@@ -16,6 +16,7 @@ Customer::~Customer() {}
 // print the data to output stream
 // the Address prints itself, Customer does not need to know
 // how an address is laid out
+// this method is const, so Address::print must be const too
 // param: out : ostream& - reference to output stream
 // return: ostream& - output stream
 std::ostream& Customer::print(std::ostream &out) const {

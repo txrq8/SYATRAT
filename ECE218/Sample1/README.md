@@ -62,11 +62,15 @@ std::ostream& Customer::print(std::ostream &out) const {
    `home` is an `Address` object, not a pointer, so the compiler needs the full class to know how big a `Customer` is.
    A forward declaration (`class Address;`) is not enough:
    `error: field 'home' has incomplete type 'Address'`.
-2. **`Address` needs a `print(std::ostream&)` (or `operator<<`).** `Customer::print` has to output the address, but the address fields are private to `Address`, so `Address` must print itself.
+2. **`Address` needs a `print(std::ostream&)` (or `operator<<`), and it must be `const`.** `Customer::print` has to output the address, but the address fields are private to `Address`, so `Address` must print itself.
+   `Customer::print` is `const`, so inside it `home` is a `const Address`, and it can only call `const` methods. If `Address::print` is not `const`, the compiler reports
+   `error: passing 'const Address' as 'this' argument discards qualifiers`.
 3. **`Address` needs a working copy constructor.** The constructor takes `Address home` *by value*, which is one copy, and `home(home)` in the initializer list copies it again into the member. `Customer c2(c1)` and `c3 = c1` also copy `home`, so `Address` needs a working `operator=` as well.
-   The compiler-generated versions would be correct here, because every member is a `std::string` (no pointers, so no deep copy is needed). The design writes them out anyway to show exactly what `Customer` relies on (rule of three).
-4. **A default constructor `Address()`**, if `Customer` ever sets `home` in the constructor body (`this->home = home;`) instead of the initializer list, or if a default `Customer` or an array of `Customer` is added. Otherwise:
+   The compiler-generated versions would be correct here, because every member is a `std::string` (no pointers, so no deep copy is needed).
+   The design writes them out anyway, to show exactly what `Customer` relies on. There is a second reason: `Address` declares a destructor, and since C++11 the compiler-generated copy of a class that has a user-declared destructor is deprecated. This is the rule of three: if you write one of the destructor, copy constructor or `operator=`, write all three.
+4. **A default constructor `Address()`**, if `Customer` ever sets `home` in the constructor body (`this->home = home;`) instead of the initializer list. `home` is then built with `Address()` first and assigned afterwards. Otherwise:
    `error: no matching function for call to 'Address::Address()'`.
+   In the same way, `Customer` has no default constructor, because it declares a constructor with parameters. So `Customer c;` or `Customer list[10];` gives `error: no matching function for call to 'Customer::Customer()'`. To allow those, add `Customer()`, which in turn needs `Address()` for `home`.
 5. **Include guards** (`#ifndef ADDRESS_H_ / #define ADDRESS_H_ / #endif`). `main.cpp` includes both `address.h` and `customer.h`, and `customer.h` includes `address.h` again. Without the guards you get
    `error: redefinition of 'class Address'`.
 6. **`#include <iostream>` and `<string>`**, and `std::` on `string` and `ostream` in the headers (no `using namespace std;` in a header).
@@ -93,12 +97,12 @@ Passing `Address` (and the strings) by `const &` would save a copy. The UML says
 | + Address(other : const Address&)          // copy constructor    |
 | + operator=(other : const Address&) : Address&                    |
 | + ~Address()                               // virtual             |
-| + getStreet() : string  ... getZip() : string                     |
+| + getStreet() : string  ... getZip() : string        {const}      |
 | + setStreet(s : string) ... setZip(z : string)                    |
-| + isValid() : bool                                                |
-| + print(out : ostream&) : ostream&                                |
-| - validState() : bool                                             |
-| - validZip() : bool                                               |
+| + isValid() : bool                                   {const}      |
+| + print(out : ostream&) : ostream&                   {const}      |
+| - validState() : bool                                {const}      |
+| - validZip() : bool                                  {const}      |
 +-------------------------------------------------------------------+
   operator<<(out : ostream&, a : const Address&) : ostream&   (free function)
 ```
@@ -112,7 +116,7 @@ Why each piece is there:
 - **Virtual destructor**: follows the course style. It is empty because strings free themselves.
 - **Getters/setters**: other classes can read or change parts of an address (for example, sort customers by zip) without breaking information hiding.
 - **`isValid()`**: checks that street and city are not empty, the state is 2 uppercase letters, and the zip is `NNNNN` or `NNNNN-NNNN`. It checks the format only; checking that a state really exists would need a table of the ~60 USPS codes. The helpers are private because they are only used inside the class.
-- **`print(std::ostream&)` returning the stream**: this is the method `Customer::print` needs. It works with `std::cout`, `std::cerr` or a file.
+- **`print(std::ostream&)` returning the stream**: this is the method `Customer::print` needs. It is `const` so that the `const` `Customer::print` can call it. It works with `std::cout`, `std::cerr` or a file.
 - **`operator<<`**: convenience, so `std::cout << a;` works. It just calls `print`.
 
 ## Sample output

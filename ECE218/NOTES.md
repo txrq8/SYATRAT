@@ -143,8 +143,46 @@ growth `×2` ⇒ amortized O(1). `std::vector<T>`: `push_back`, `size()`, `capac
 
 ## 6. Solved papers in this folder
 
-* `Practice1/` — Smart Home (Room + Light) — full code, data file, Makefile, README.
-* `Sample1/` — Customer + Address classes (Sample Q3, Q4).
-* `SOLUTIONS.md` — all Sample1 answers (G1–G20, L1–L4) and Practice1 walkthrough.
-* `tools/trace.cpp` — prints pass-by-pass traces for any array:
-  `g++ -std=c++11 -o trace tools/trace.cpp && ./trace all 10 2 12 5 3`.
+* `SOLUTIONS.md` / `ECE218_Solutions.pdf` (84 pages) — every Sample1 answer (G1–G20, L1–L4)
+  and the full Practice1 solution; each answer = exam-ready English + worked steps + Arabic
+  step-by-step explanation + the lecture page it comes from. All drafted, then adversarially
+  re-checked; every code sample compiled (g++ & clang++ -Wall -Wextra), run, valgrind-clean.
+* `Practice1/` — Smart Home (Room + Light) — full code, data file `room.txt`, Makefile, README.
+* `Sample1/` — Customer + Address classes (Sample L3, L4) + test driver.
+* `Examples/` — tested IntVector (self-sizing array, deep copy), memory spaces, pointer vs
+  reference, deep copy, template bubble sort, polymorphism.
+* `tools/trace.cpp` — pass-by-pass traces of the instructor's algorithms for any array:
+  `g++ -std=c++11 -o trace tools/trace.cpp && ./trace all 10 2 12 5 3`
+  (algorithms: bubble selmax selmin insertion merge lomuto hoare quick quickh med3 all).
+* `tools/md2pdf.py` — Markdown → styled PDF (Arabic RTL blocks, `[[token]]` = English on its
+  own line, highlighted code): `python3 tools/md2pdf.py in.md out.pdf`.
+  Needs: `pip install markdown-it-py pygments`, Noto fonts (`apt-get install fonts-noto-core`),
+  poppler-utils, Playwright Chromium (preinstalled at /opt/pw-browsers).
+
+Pitfalls found while checking (keep in mind when writing answers):
+* A reference *can* dangle (object died) — say "cannot be null / must be initialized", not
+  "always valid". `r++` on a reference increments the referred variable.
+* Code in answers must be inside a function (`int main(){...}`) to compile.
+* Vector growth `×2` needs starting capacity ≥ 1 (2×0 = 0).
+* Private members of a base ARE inherited (exist in the object) but are not accessible in
+  the derived class; the compiler says "is private within this context".
+* Median-of-3 on reverse data: first split is a perfect half, later splits balanced (not all
+  perfect); sorted data: perfect halves every level.
+* Selection sort: count a swap only when `max_loc != N-1-i` (lecture P4 = 0 swaps).
+* Hoare partition: pivot not necessarily in final place; recurse `(start,p)`, `(p+1,end)`.
+
+## 7. Playbook for solving a new ECE 218 paper
+
+1. Read this file (sections 0–5) first; follow the instructor conventions in section 0.
+2. Transcribe every question exactly (numbers, arrays, UML) — re-read the photo twice;
+   ask the student about any unreadable digit instead of guessing.
+3. Sorting traces → run `tools/trace` on the exact array and copy the verified passes;
+   show instructor version first (selection = find max → end), textbook version as note.
+4. Code questions → write in instructor style (header guard, initializer list, virtual
+   destructor, `std::ostream& print(std::ostream&)`, `// param:` comments), compile with
+   `g++ -std=c++11 -Wall -Wextra -pedantic`, run, valgrind; paste the real output.
+5. Theory → short exam-ready English answer + small example; tie to the lecture page.
+6. Second pass: adversarially re-check every claim/number (or a verify workflow), fix.
+7. Write `PaperN/SOLUTIONS.md` (English answer + Arabic `<div class="ar" markdown="1">`
+   block with `[[...]]` for English tokens), build PDF with `tools/md2pdf.py`, look at
+   rendered pages (`pdftoppm -r 60 -png`), then send.

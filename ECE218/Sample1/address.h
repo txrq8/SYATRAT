@@ -67,6 +67,8 @@ class Address {
         bool isValid() const;
 
         // print the address
+        // const: Customer::print is const, so it can only call
+        // const methods on its home member
         std::ostream& print(std::ostream&) const;
 
 };
