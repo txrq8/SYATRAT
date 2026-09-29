@@ -148,6 +148,8 @@ growth `×2` ⇒ amortized O(1). `std::vector<T>`: `push_back`, `size()`, `capac
 
 ## 6. Solved papers in this folder
 
+* `LECTURE_TRANSCRIPT.md` — every lecture page transcribed verbatim at 300 dpi (checked independently), with ambiguous-handwriting decisions and verified board slips.
+* `OUTLINE_TOPICS.md` — verified notes on course-outline topics beyond the Exam 1 list: searching (linear/binary), recursion, linked lists, advanced I/O, bounds-tested & 2D arrays.
 * `PRACTICE_BANK.md` / `ECE218_Practice_Bank.pdf` — 45 extra exam-style questions (sorting, memory/pointers, OOP/vector) with verified answers.
 * `SOLUTIONS.md` / `ECE218_Solutions.pdf` (84 pages) — every Sample1 answer (G1–G20, L1–L4)
   and the full Practice1 solution; each answer = exam-ready English + worked steps + Arabic
@@ -428,3 +430,53 @@ Doubling N: O(N²) → ≈×4 (measured ×5, cache effects); O(N log N) → slig
 - UML/design reading and drawing: draw a class diagram for a described system (the university personnel hierarchy); mark + - # visibility and `name : type`; tell inheritance (hollow triangle, is-a) from association (plain line such as 'mentor'); say which attributes to hide; decide class vs struct.
 - Compile/execution mechanics: give the g++ command for a multi-file build (`g++ main.cpp student.cpp -o student`, `g++ sort.cpp support.cpp -o sort`); say whether an error comes from the compiler or the linker ('undefined reference'); state the argc/argv values for `./hello one two three`; `<` and `>` redirection and the mkdata | sort pipeline; the effect of `-DDEBUG`; why `srandomdev` fails on Linux and what `#if defined(__unix__)` is for.
 - Generic programming comparison: design the six-parameter C bubble (compare, allocate, assign); write a compare function for descending order, for double, or for a struct field (used with qsort or sortb); explain why memcpy-based swapping is wrong for std::string objects (the sort stays unsorted) and why C++ templates fix that but need operator/support functions and the code in the header.
+
+---
+
+## 10. Board vs. correct — the instructor's handwritten slips (all VERIFIED by compiling/running)
+
+Full verbatim page-by-page text: `LECTURE_TRANSCRIPT.md`. Use the board's *ideas* and the
+*correct code* below; never copy the board syntax literally.
+
+| Page | Board (as written) | Correct / what really happens |
+|---|---|---|
+| 8/20 memory | code drawn above `g. const` | on g++/Linux `.text` (code) is actually *below* `.rodata`; both R/O — draw his order on the exam |
+| 8/27 bubble | red count column `N-1, N-2, N-2, …` | third term is `N-3`; total `N(N-1)/2` |
+| 8/27 bubble | "Best case O(N) sorted (early exit)" | needs a `swapped` flag; his loops/sort.cpp have none → sorted input still 10 comps for N=5 |
+| 8/27 selection | labels swapped: `outer: j`, `inner: i : 1 → N-1-i` | `for(i=0;i<N;i++){ max_loc=0; for(j=1;j<N-i;j++) if(a[j]>a[max_loc]) max_loc=j; swap(a[max_loc],a[N-1-i]); }` |
+| 8/27 selection | `max_loc = 0` drawn inside the inner (dashed) scope | must be set ONCE per pass before the inner loop (literal version turns `5 4 8 1 3` into `1 4 8 3 5`) |
+| 8/27 selection | swap column 1,1,1,0 | counts real exchanges; unconditional code makes N swap calls (self-swaps) |
+| 8/27 insertion | example `1 6 9 3 8 1`, row 3 unfinished | whole array: 12 comps, 7 swaps (swap version); use `>` (not `>=`) to stay stable; stop at index 0 |
+| 9/1 merge | else branch `C[t] = B[j]` | `C[k] = B[j]` |
+| 9/1 merge | `if A[i] < B[j]` | works; `<=` makes the merge stable |
+| 9/1 mergesort | `mid_point=(end-start+1)/2+start`, halves `[start..mid_point]`,`[mid_point+1..end]`, **no base case** | infinite recursion on 2 elements; write `if(start>=end) return; mid=(start+end)/2;` (reproduces his 5 4 8 \| 1 3 6 tree) |
+| 9/1 mergesort | `len(A)` etc. | pseudocode — pass lengths as parameters in C++ |
+| 9/3 Lomuto | code missing last two lines | add `swap(A[i+1],A[end]); return i+1;` — trace result `8 1 3 6 9 12`, p=4 |
+| 9/3 Lomuto | mixes `A[end]` and `a[j]` | C++ is case-sensitive — one name |
+| 9/3 Hoare | `i++, while(A[i]<pivot) i++` | `i++; while(A[i]<pivot) i++;` (comma form doesn't compile) |
+| 9/3 Hoare | hand trace ends `6 1 3 8 12 9` | the written code gives `6 1 3 12 8 9`, returns j=2; pivot not necessarily at j; recurse `(start,p)`,`(p+1,end)` |
+| 9/3 quicksort tree | first pivot 6 | illustration of the ideal (true median); none of his pivot rules picks 6 (end→9, start→8, median-of-3→9) |
+| 9/10 generic C | `if (A[j] > A[j+1])` on `void*` | can't compile — that's why `compare(a,b)` exists; element j = `(char*)arr + j*esize` |
+| 9/10 generic C | `int compare(void *a, void *b)` | qsort needs `int comp(const void*, const void*)` |
+| 9/10 generic C | malloc temp, memcpy swap | `memcpy(dest, src, n)`; `free(temp)` at end; raw-byte copy breaks `std::string` (crash) → templates |
+| 9/10 generic C | "compare returns -1/0/1" | only test `> 0` / `< 0` (sortt returns `a-b`) |
+| 9/15 templates | `if ( i=0 ; i<num ; i++ )` | `for (int i=0; i<num; i++)` |
+| 9/15 templates | parameter `arr`, body uses `a[j]` | use one name |
+| 9/15 templates | `swapT(...)` never defined | `template <class T> void swapT(T &a, T &b){ T t=a; a=b; b=t; }` |
+| 9/15 templates | `operator>(const int&, const int&)` | impossible for built-ins (must involve a class type); overload `>` only for your own class |
+| 9/15 templates | `int arri[n]` with variable n | VLA, not standard C++ (`-Wvla`); use `new int[n]` |
+| 9/15 templates | "put code in .h" | body only in a .cpp → `undefined reference to 'void bubbleT<int>(int*, int)'` |
+| 9/15, 9/17 struct | `n.first = 'John"` | `n.first = "John";` (`'John'` compiles but stores one char!) + `std::string` / `#include <string>` |
+| 9/17 UML p1 | triangle drawn `Person ▷—— Student` | UML: hollow triangle tip at the PARENT `Person ◁—— Student` (page 2 draws it right) |
+| 9/17 polymorphism | `p->print()` "Student version" | only if `print` is `virtual` in Person; `Person *p = s` needs `class Student : public Person` |
+| 9/17 overloading | `compare(int,int)`, `compare(float,float)` | `compare(1.5, 2.5)` is **ambiguous** (double literals) — use `1.5f` |
+| 9/17 | `Student::compare(s)` vs `Person::compare()` | different parameters → hides, doesn't override (`s.compare()` fails) |
+| 9/17 | "`Student::` = namespace (scope)" | strictly *class scope* with the scope-resolution operator `::` |
+| 9/22 class | `public` without `:`; `}` without `;` | `public:` and `};` |
+| 9/22 copy | `s2 = s1` → "Copy Constructor" | s2 already exists → **`operator=`**; copy ctor runs for `Student s2 = s1;` |
+| 9/22 copy | `Student(Student &)` | prefer `Student(const Student &)` (can copy const objects) |
+| 9/22 copy | default copy | pointer member shared (shallow), member array `arr[100]` copied fully |
+| 9/22 resize | `delete temp[]` | `delete [] temp;` then `temp = nullptr;` |
+| 9/24 vector | "true: resize / false: add" | if full → resize; then ALWAYS `arr2[curr]=e; curr++;` |
+| 9/24 vector | `addAtEnd(elem &e)` | `const elem &e` (else `addAtEnd(5)` won't compile) |
+| 9/24 vector | `+ (factor)(max_elements)` | never grows from 0 → start capacity ≥ 1; costs for 100,000 adds: +1 → 4,999,950,000 copies, +100 → 49,951,000, doubling → 131,071 |
