@@ -37,6 +37,15 @@ class Address {
         Address(std::string street, std::string unit, std::string city,
                 std::string state, std::string zip);
 
+        // copy constructor
+        // used when an Address is passed by value, and by
+        // Customer's initializer list home(home)
+        Address(const Address&);
+
+        // assignment operator
+        // used when a Customer is assigned: c3 = c1 copies c1.home
+        Address& operator=(const Address&);
+
         // destructor
         virtual ~Address();
 

@@ -26,6 +26,30 @@ Address::Address(std::string street, std::string unit, std::string city,
                  std::string state, std::string zip)
     : street(street), unit(unit), city(city), state(state), zip(zip) {}
 
+// copy constructor
+// makes a new Address with the same data as other
+// all members are std::string, so copying each one is a full copy
+// (no pointers, so no deep copy code is needed)
+// param: other : const Address& - address to copy
+Address::Address(const Address &other)
+    : street(other.street), unit(other.unit), city(other.city),
+      state(other.state), zip(other.zip) {}
+
+// assignment operator
+// copies the data of other into this Address
+// param: other : const Address& - address to copy
+// return: Address& - this Address, so a = b = c works
+Address& Address::operator=(const Address &other) {
+    if (this != &other) {      // a = a: nothing to do
+        street = other.street;
+        unit = other.unit;
+        city = other.city;
+        state = other.state;
+        zip = other.zip;
+    }
+    return *this;
+}
+
 // destructor
 // do not need code, all members are std::string
 // and clean up after themselves

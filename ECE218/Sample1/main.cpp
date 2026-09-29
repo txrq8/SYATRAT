@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
     std::cout << "+++++++++++++++++++++++++++++++++\n";
     std::cout << "Address a after the set calls:\n";
     a.print(std::cout);
+    std::cout << "valid: " << (a.isValid() ? "yes" : "no") << std::endl;
     std::cout << "Customer c1 is unchanged:\n";
     c1.print(std::cout);
 
