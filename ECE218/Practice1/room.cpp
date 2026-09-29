@@ -20,6 +20,8 @@ Room::Room(int id, std::string name, std::string location)
 Room::~Room() {}
 
 // turn ON the light at index
+// numLights is never more than MAX_LIGHTS, so a valid index is
+// always inside the array (0 .. 4)
 // param: index : int - index of the light (0 .. numLights-1)
 // return: int - 0 on success, -1 if index is invalid
 int Room::setLightOn(int index) {
@@ -30,6 +32,8 @@ int Room::setLightOn(int index) {
 }
 
 // turn OFF the light at index
+// numLights is never more than MAX_LIGHTS, so a valid index is
+// always inside the array (0 .. 4)
 // param: index : int - index of the light (0 .. numLights-1)
 // return: int - 0 on success, -1 if index is invalid
 int Room::setLightOff(int index) {
@@ -89,6 +93,8 @@ int Room::getNumLights() {
 }
 
 // set the number of lights in use
+// (making it larger shows the lights already stored in those
+// slots, a default Light if the slot was never set)
 // param: numLights : int - number of lights (0 .. MAX_LIGHTS)
 // return: int - 0 on success, -1 if numLights is out of range (not changed)
 int Room::setNumLights(int numLights) {

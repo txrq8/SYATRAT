@@ -74,9 +74,12 @@ int loadRoom(std::istream &in, Room &room) {
     }
 
     // 5. keyword "End"
+    // if it is not found, the number of lights usually does not
+    // match the number of light lines in the file
     in >> keyword;
     if (in.fail() || keyword != "End") {
-        std::cerr << "Error: expected keyword 'End'\n";
+        std::cerr << "Error: expected keyword 'End' after " << count
+                  << " lights (check the number of lights)\n";
         return -1;
     }
 
