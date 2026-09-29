@@ -1,6 +1,6 @@
 # build outputs
 *.o
-ECE218/Practice1/smarthome
-ECE218/Sample1/customer
-ECE218/Examples/examples
-ECE218/tools/trace
+Practice1/smarthome
+Sample1/customer
+Examples/examples
+tools/trace
