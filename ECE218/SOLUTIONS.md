@@ -1506,7 +1506,7 @@ A **Vector** is a **self-sizing (dynamic) array**:
 2. **Random access in O(1):** get or change the value at any index directly (`arr2[i]`).
 3. **Size vs capacity:** `curr_element` = number of elements used (size) <= `max_elements` = number of slots allocated (capacity).
 4. **Grows automatically:** `addAtEnd(e)`: check if full; if full -> **resize** (allocate a bigger array, copy the old elements, `delete []` the old array, update `max_elements`); then `arr2[curr_element] = e; curr_element++;`.
-5. **Growth policy:** +1, +constant (e.g. +100), or x factor (e.g. x2). With +1 or +constant the total copying for N adds is O(N^2), i.e. O(N) per add on average. With **doubling** it is O(N) total, i.e. **amortized O(1)** per `addAtEnd`. (With a factor, the capacity must start at 1 or more: 2 x 0 is still 0.)
+5. **Growth policy** (9/24 board): new max_elements = max + 1, or max + 100 (constant), or max + factor x max_elements (factor 1 = doubling, x2). With +1 or +constant the total copying for N adds is O(N^2), i.e. O(N) per add on average. With **doubling** it is O(N) total, i.e. **amortized O(1)** per `addAtEnd`. (With a factor, the capacity must start at 1 or more: 2 x 0 is still 0.)
 6. **Add/remove at the end: O(1)** (amortized). **Add/remove at the start or middle: O(N)**, because elements must be shifted right/left.
 7. **Can shrink / compress** (resize down to `curr_element`) to free unused memory.
 8. **Owns heap memory**, so it is written as a class with private data, a destructor (`delete []`), and a deep-copy copy constructor/assignment (the default copy is shallow, so two vectors would share one array).
