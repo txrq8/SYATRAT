@@ -1,0 +1,8 @@
+Room
+1 LivingRoom FirstFloor
+Light 4
+101 Ceiling
+102 FloorLamp
+103 TableLamp
+104 WallSconce
+End
