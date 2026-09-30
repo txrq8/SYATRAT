@@ -191,9 +191,14 @@ Pitfalls found while checking (keep in mind when writing answers):
    `g++ -std=c++11 -Wall -Wextra -pedantic`, run, valgrind; paste the real output.
 5. Theory → short exam-ready English answer + small example; tie to the lecture page.
 6. Second pass: adversarially re-check every claim/number (or a verify workflow), fix.
-7. Write `PaperN/SOLUTIONS.md` (English answer + Arabic `<div class="ar" markdown="1">`
-   block with `[[...]]` for English tokens), build PDF with `tools/md2pdf.py`, look at
-   rendered pages (`pdftoppm -r 60 -png`), then send.
+7. Write `PaperN/SOLUTIONS.md`, build PDF with `tools/md2pdf.py`, look at rendered pages
+   (`pdftoppm -r 60 -png`), then send ONE PDF with everything.
+
+**Student's format preference (stated 9/30):** for each question give only
+**the answer + short numbered steps** — correct, simple, not long. No long explanations,
+no extra "details" sections, no long Arabic blocks. Keep code to what the question asks
+(no extra validation/features). Traces as compact tables. Verification is done behind the
+scenes, not printed in the PDF.
 
 ---
 
